@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 
 class AlgorithmHelperTests {
@@ -157,6 +158,52 @@ class AlgorithmHelperTests {
         int scoreTwoSharedInterests = MatchAlgorithmHelper.calculateSameInterestsScore(profileOne, profileTwo);
 
         Assertions.assertTrue(scoreTwoSharedInterests > scoreOneSharedInterest && scoreTwoSharedInterests < 100 && scoreOneSharedInterest >= 50);
+    }
+
+    @Test
+    void testGetFavoriteInterestsReturnsTheFavoriteInterests() {
+        Profile profile = new Profile();
+
+        Interest interestOne = new Interest(-1, "pils");
+        Interest interestTwo = new Interest(-1, "bier");
+        Interest interestThree = new Interest(-1, "sos");
+        Interest interestFour = new Interest(-1, "moh");
+
+        Collection<Interest> likedInterests = new ArrayList<>();
+        Collection<Interest> dislikedInterests = new ArrayList<>();
+
+        likedInterests.add(interestOne);
+        likedInterests.add(interestOne);
+        likedInterests.add(interestOne);
+        likedInterests.add(interestOne);
+
+        likedInterests.add(interestTwo);
+
+        likedInterests.add(interestThree);
+        likedInterests.add(interestThree);
+
+        likedInterests.add(interestFour);
+        likedInterests.add(interestFour);
+
+        dislikedInterests.add(interestOne);
+
+        dislikedInterests.add(interestThree);
+
+        dislikedInterests.add(interestFour);
+        dislikedInterests.add(interestFour);
+
+        profile.setLikedInterests(likedInterests);
+        profile.setDislikedInterests(dislikedInterests);
+
+        Collection<Interest> favoriteInterests = MatchAlgorithmHelper.getFavoriteInterests(profile);
+
+        favoriteInterests.forEach((interest -> {
+            if (interest.getName().equals(interestTwo.getName()) || interest.getName().equals(interestFour.getName())) {
+                Assertions.fail("Interest should not be a favorite.");
+            }
+        }));
+
+        Assertions.assertEquals(2, favoriteInterests.size());
     }
 
 }

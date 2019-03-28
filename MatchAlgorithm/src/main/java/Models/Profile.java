@@ -1,6 +1,7 @@
 package Models;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class Profile {
@@ -9,13 +10,15 @@ public class Profile {
     private String name;
     private Collection<Interest> interests;
     private Collection<Interest> likedInterests;
-    private Collection<Interest> dislikedInterest;
+    private Collection<Interest> dislikedInterests;
     private Gender gender;
     private Gender preference;
     private int age;
 
     public Profile() {
         interests = new ArrayDeque<>();
+        likedInterests = new ArrayList<>();
+        dislikedInterests = new ArrayList<>();
     }
 
     public Profile(int id, String name, Collection<Interest> interests, Gender gender) {
@@ -65,12 +68,12 @@ public class Profile {
         this.likedInterests = likedInterests;
     }
 
-    public Collection<Interest> getDislikedInterest() {
-        return dislikedInterest;
+    public Collection<Interest> getDislikedInterests() {
+        return dislikedInterests;
     }
 
-    public void setDislikedInterest(Collection<Interest> dislikedInterest) {
-        this.dislikedInterest = dislikedInterest;
+    public void setDislikedInterests(Collection<Interest> dislikedInterest) {
+        this.dislikedInterests = dislikedInterest;
     }
 
     public Gender getPreference() {
