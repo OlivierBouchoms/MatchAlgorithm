@@ -22,7 +22,7 @@ class AlgorithmTests {
     }
 
     @Test
-    void testCalulateMatchConflictingGender() {
+    void testCalculateMatchConflictingGender() {
         Profile profileOne = new Profile();
         Profile profileTwo = new Profile();
 
