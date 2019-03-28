@@ -270,6 +270,8 @@ class AlgorithmHelperTests {
         Collection<Interest> profileTwoFavorites = MatchAlgorithmHelper.getFavoriteInterests(profileTwo);
 
         int score = MatchAlgorithmHelper.calculateLikedEachOthersInterestsScore(profileOneFavorites, profileTwoFavorites, profileOne, profileTwo);
+
+        Assertions.fail("Test not finished yet");
     }
 
 }
