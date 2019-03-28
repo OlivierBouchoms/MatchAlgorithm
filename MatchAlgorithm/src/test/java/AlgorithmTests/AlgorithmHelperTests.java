@@ -2,9 +2,13 @@ package AlgorithmTests;
 
 import Algorithm.MatchAlgorithmHelper;
 import Models.Gender;
+import Models.Interest;
 import Models.Profile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayDeque;
+import java.util.Collection;
 
 class AlgorithmHelperTests {
 
@@ -117,6 +121,42 @@ class AlgorithmHelperTests {
 
         Assertions.assertTrue(MatchAlgorithmHelper.ageConflicts(profileOne, profileTwo));
         Assertions.assertTrue(MatchAlgorithmHelper.ageConflicts(profileTwo, profileOne));
+    }
+
+    @Test
+    void testCalculateSameInterests3SharedInterestsScoreReturns100() {
+        Profile profileOne = new Profile();
+        Profile profileTwo = new Profile();
+
+        Collection<Interest> interests = new ArrayDeque<>();
+        interests.add(new Interest(-1, "pils"));
+        interests.add(new Interest(-1, "bier"));
+        interests.add(new Interest(-1, "sos"));
+
+        profileOne.setInterests(interests);
+        profileTwo.setInterests(interests);
+
+        Assertions.assertEquals(100, MatchAlgorithmHelper.calculateSameInterestsScore(profileOne, profileTwo));
+    }
+
+    @Test
+    void testCalculateSameInterests1or2SharedInterestsScoreReturnsBetween50And100() {
+        Profile profileOne = new Profile();
+        Profile profileTwo = new Profile();
+
+        Collection<Interest> interests = new ArrayDeque<>();
+        interests.add(new Interest(-1, "pils"));
+
+        profileOne.setInterests(interests);
+        profileTwo.setInterests(interests);
+
+        int scoreOneSharedInterest = MatchAlgorithmHelper.calculateSameInterestsScore(profileOne, profileTwo);
+
+        interests.add(new Interest(-1, "bier"));
+
+        int scoreTwoSharedInterests = MatchAlgorithmHelper.calculateSameInterestsScore(profileOne, profileTwo);
+
+        Assertions.assertTrue(scoreTwoSharedInterests > scoreOneSharedInterest && scoreTwoSharedInterests < 100 && scoreOneSharedInterest >= 50);
     }
 
 }
