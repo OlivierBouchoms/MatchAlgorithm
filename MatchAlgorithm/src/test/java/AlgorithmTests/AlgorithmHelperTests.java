@@ -1,6 +1,5 @@
 package AlgorithmTests;
 
-import Algorithm.MatchAlgorithm;
 import Algorithm.MatchAlgorithmHelper;
 import Models.Gender;
 import Models.Interest;
@@ -12,19 +11,28 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 class AlgorithmHelperTests {
 
-
     private Profile profileOne;
     private Profile profileTwo;
+    private Collection<Interest> interestsPersonOne;
+    private Collection<Interest> interestsPersonTwo;
+    private Collection<Interest> interests;
+    private List<Interest> likedInterests;
+    private List<Interest> dislikedInterests;
 
     @BeforeEach
     void init() {
         profileOne = new Profile();
         profileTwo = new Profile();
+        interestsPersonOne = new ArrayDeque<>();
+        interestsPersonTwo = new ArrayDeque<>();
+        interests = new ArrayDeque<>();
+        likedInterests = new ArrayList<>();
+        dislikedInterests = new ArrayList<>();
     }
-
 
     @Test
     void testCalculateAgeScoreSameAgeShouldReturn100() {
@@ -114,7 +122,6 @@ class AlgorithmHelperTests {
 
     @Test
     void testCalculateSameInterests3SharedInterestsScoreReturns100() {
-        Collection<Interest> interests = new ArrayDeque<>();
         interests.add(new Interest(-1, "pils"));
         interests.add(new Interest(-1, "bier"));
         interests.add(new Interest(-1, "sos"));
@@ -127,7 +134,6 @@ class AlgorithmHelperTests {
 
     @Test
     void testCalculateSameInterests1or2SharedInterestsScoreReturnsBetween50And100() {
-        Collection<Interest> interests = new ArrayDeque<>();
         interests.add(new Interest(-1, "pils"));
 
         profileOne.setInterests(interests);
@@ -148,9 +154,6 @@ class AlgorithmHelperTests {
         Interest interestTwo = new Interest(-1, "bier");
         Interest interestThree = new Interest(-1, "sos");
         Interest interestFour = new Interest(-1, "moh");
-
-        Collection<Interest> likedInterests = new ArrayList<>();
-        Collection<Interest> dislikedInterests = new ArrayList<>();
 
         likedInterests.add(interestOne);
         likedInterests.add(interestOne);
@@ -194,21 +197,17 @@ class AlgorithmHelperTests {
         Interest interestFour = new Interest(-1, "moh");
         Interest interestFive = new Interest(-1, "angerfist");
 
-        Collection<Interest> interestCollectionOne = new ArrayDeque<>();
-        Collection<Interest> interestCollectionTwo = new ArrayDeque<>();
+        interestsPersonOne.add(interestOne);
+        interestsPersonOne.add(interestTwo);
+        interestsPersonOne.add(interestFour);
 
-        interestCollectionOne.add(interestOne);
-        interestCollectionOne.add(interestTwo);
-        interestCollectionOne.add(interestFour);
+        interestsPersonTwo.add(interestTwo);
+        interestsPersonTwo.add(interestThree);
+        interestsPersonTwo.add(interestFour);
+        interestsPersonTwo.add(interestFive);
 
-        interestCollectionTwo.add(interestTwo);
-        interestCollectionTwo.add(interestThree);
-        interestCollectionTwo.add(interestFour);
-        interestCollectionTwo.add(interestFive);
-
-        int numberOfOccurrences = MatchAlgorithmHelper.getSameOccurrences(interestCollectionOne, interestCollectionTwo);
-
-        Assertions.assertEquals(2, numberOfOccurrences);
+        Assertions.assertEquals(2, MatchAlgorithmHelper.getSameOccurrences(interestsPersonOne, interestsPersonTwo));
+        Assertions.assertEquals(2, MatchAlgorithmHelper.getSameOccurrences(interestsPersonTwo, interestsPersonOne));
     }
 
     @Test
@@ -219,44 +218,107 @@ class AlgorithmHelperTests {
         Interest interestFour = new Interest(-1, "moh");
         Interest interestFive = new Interest(-1, "angerfist");
 
-        Collection<Interest> interestCollectionOne = new ArrayDeque<>();
-        Collection<Interest> interestCollectionTwo = new ArrayDeque<>();
+        interestsPersonOne.add(interestOne);
+        interestsPersonOne.add(interestTwo);
+        interestsPersonOne.add(interestThree);
+        interestsPersonOne.add(interestFour);
+        interestsPersonOne.add(interestFive);
 
-        interestCollectionOne.add(interestOne);
-        interestCollectionOne.add(interestTwo);
-        interestCollectionOne.add(interestThree);
-        interestCollectionOne.add(interestFour);
-        interestCollectionOne.add(interestFive);
+        interestsPersonTwo.add(interestOne);
+        interestsPersonTwo.add(interestTwo);
+        interestsPersonTwo.add(interestThree);
+        interestsPersonTwo.add(interestFour);
+        interestsPersonTwo.add(interestFive);
 
-        interestCollectionTwo.add(interestOne);
-        interestCollectionTwo.add(interestTwo);
-        interestCollectionTwo.add(interestThree);
-        interestCollectionTwo.add(interestFour);
-        interestCollectionTwo.add(interestFive);
-
-        int numberOfOccurrences = MatchAlgorithmHelper.getSameOccurrences(interestCollectionOne, interestCollectionTwo);
+        int numberOfOccurrences = MatchAlgorithmHelper.getSameOccurrences(interestsPersonOne, interestsPersonTwo);
 
         Assertions.assertEquals(3, numberOfOccurrences);
     }
 
     @Test
+    void testCalculateScore() {
+        int expected = 60;
+
+        int ageScore = 50;
+        int sameInterestScore = 70;
+        int likedEachOthersInterestsScore = 55;
+
+        Assertions.assertEquals(expected, MatchAlgorithmHelper.calculateScore(ageScore, sameInterestScore, likedEachOthersInterestsScore));
+    }
+
+    @Test
+    void testCalculateScorePerfectMatchReturns100() {
+        int expected = 100;
+
+        int ageScore = 100;
+        int sameInterestScore = 100;
+        int likedEachOthersInterestsScore = 100;
+
+        Assertions.assertEquals(expected, MatchAlgorithmHelper.calculateScore(ageScore, sameInterestScore, likedEachOthersInterestsScore));
+    }
+
+    @Test
     void testCalculateLikedEachOthersInterestsScore() {
-        Collection<Interest> interestsPersonOne = new ArrayDeque<>();
-        Collection<Interest> likedInterestsPersonOne = new ArrayList<>();
-        Collection<Interest> dislikedInterestsPersonOne = new ArrayList<>();
+        List<Interest> likedInterestsPersonOne = new ArrayList<>();
+        List<Interest> dislikedInterestsPersonOne = new ArrayList<>();
 
-        Collection<Interest> interestsPersonTwo = new ArrayDeque<>();
-        Collection<Interest> likedInterestsPersonTwo = new ArrayList<>();
-        Collection<Interest> dislikedInterestsPersonTwo = new ArrayList<>();
+        List<Interest> likedInterestsPersonTwo = new ArrayList<>();
+        List<Interest> dislikedInterestsPersonTwo = new ArrayList<>();
 
-        final Interest pils = new Interest(-1, "pils");
-        final Interest bier = new Interest(-1, "bier");
-        final Interest moh = new Interest(-1, "moh");
-        final Interest tekenen = new Interest(-1, "tekenen");
-        final Interest vanGogh = new Interest(-1, "van Gogh");
-        final Interest stappen = new Interest(-1, "stappen");
+        final Interest interestOne = new Interest(-1, "pils");
+        final Interest interestTwo = new Interest(-1, "bier");
+        final Interest interestThree = new Interest(-1, "moh");
+        final Interest interestFour = new Interest(-1, "tekenen");
+        final Interest interestFive = new Interest(-1, "honden");
+        final Interest interestSix = new Interest(-1, "stappen");
+        final Interest interestSeven = new Interest(-1, "horeca");
+        final Interest interestEight = new Interest(-1, "voetbal");
+        final Interest interestNine = new Interest(-1, "sport");
+        final Interest interestTen = new Interest(-1, "gamen");
 
-        // TODO: add the data to the collections
+        interestsPersonOne.add(interestOne);
+        interestsPersonOne.add(interestTwo);
+        interestsPersonOne.add(interestThree);
+        interestsPersonOne.add(interestSix);
+
+        interestsPersonTwo.add(interestFour);
+        interestsPersonTwo.add(interestFive);
+        interestsPersonTwo.add(interestSeven);
+        interestsPersonTwo.add(interestNine);
+
+        likedInterestsPersonOne.add(interestOne);
+        likedInterestsPersonOne.add(interestOne);
+        likedInterestsPersonOne.add(interestTwo);
+        likedInterestsPersonOne.add(interestTwo);
+        likedInterestsPersonOne.add(interestTwo);
+        likedInterestsPersonOne.add(interestFour);
+        likedInterestsPersonOne.add(interestSix);
+        likedInterestsPersonOne.add(interestNine);
+        likedInterestsPersonOne.add(interestNine);
+        likedInterestsPersonOne.add(interestNine);
+        likedInterestsPersonOne.add(interestNine);
+
+        dislikedInterestsPersonOne.add(interestOne);
+        dislikedInterestsPersonOne.add(interestOne);
+        dislikedInterestsPersonOne.add(interestTwo);
+        dislikedInterestsPersonOne.add(interestEight);
+        dislikedInterestsPersonOne.add(interestNine);
+        dislikedInterestsPersonOne.add(interestTen);
+
+        likedInterestsPersonTwo.add(interestTwo);
+        likedInterestsPersonTwo.add(interestTwo);
+        likedInterestsPersonTwo.add(interestTwo);
+        likedInterestsPersonTwo.add(interestThree);
+        likedInterestsPersonTwo.add(interestThree);
+        likedInterestsPersonTwo.add(interestThree);
+        likedInterestsPersonTwo.add(interestSix);
+
+        dislikedInterestsPersonTwo.add(interestOne);
+        dislikedInterestsPersonTwo.add(interestFour);
+        dislikedInterestsPersonTwo.add(interestFive);
+        dislikedInterestsPersonTwo.add(interestSix);
+        dislikedInterestsPersonTwo.add(interestSix);
+        dislikedInterestsPersonTwo.add(interestEight);
 
         profileOne.setInterests(interestsPersonOne);
         profileOne.setLikedInterests(likedInterestsPersonOne);
@@ -271,7 +333,63 @@ class AlgorithmHelperTests {
 
         int score = MatchAlgorithmHelper.calculateLikedEachOthersInterestsScore(profileOneFavorites, profileTwoFavorites, profileOne, profileTwo);
 
-        Assertions.fail("Test not finished yet");
+        Assertions.assertTrue(score > 50 && score < 65);
+    }
+
+    @Test
+    void testCalculateLikedEachOthersInterestsScorePerfectMatchReturns100() {
+        List<Interest> likedInterestsPersonOne = new ArrayList<>();
+        List<Interest> dislikedInterestsPersonOne = new ArrayList<>();
+
+        List<Interest> likedInterestsPersonTwo = new ArrayList<>();
+        List<Interest> dislikedInterestsPersonTwo = new ArrayList<>();
+
+        final Interest interestOne = new Interest(-1, "pils");
+        final Interest interestTwo = new Interest(-1, "bier");
+        final Interest interestThree = new Interest(-1, "moh");
+
+        interestsPersonOne.add(interestOne);
+        interestsPersonOne.add(interestTwo);
+        interestsPersonOne.add(interestThree);
+
+        interestsPersonTwo.add(interestOne);
+        interestsPersonTwo.add(interestTwo);
+        interestsPersonTwo.add(interestThree);
+
+        likedInterestsPersonOne.add(interestOne);
+        likedInterestsPersonOne.add(interestOne);
+        likedInterestsPersonOne.add(interestOne);
+        likedInterestsPersonOne.add(interestTwo);
+        likedInterestsPersonOne.add(interestTwo);
+        likedInterestsPersonOne.add(interestTwo);
+        likedInterestsPersonOne.add(interestThree);
+        likedInterestsPersonOne.add(interestThree);
+        likedInterestsPersonOne.add(interestThree);
+
+        likedInterestsPersonTwo.add(interestOne);
+        likedInterestsPersonTwo.add(interestOne);
+        likedInterestsPersonTwo.add(interestOne);
+        likedInterestsPersonTwo.add(interestTwo);
+        likedInterestsPersonTwo.add(interestTwo);
+        likedInterestsPersonTwo.add(interestTwo);
+        likedInterestsPersonTwo.add(interestThree);
+        likedInterestsPersonTwo.add(interestThree);
+        likedInterestsPersonTwo.add(interestThree);
+
+        profileOne.setInterests(interestsPersonOne);
+        profileOne.setLikedInterests(likedInterestsPersonOne);
+        profileOne.setDislikedInterests(dislikedInterestsPersonOne);
+
+        profileTwo.setInterests(interestsPersonTwo);
+        profileTwo.setLikedInterests(likedInterestsPersonTwo);
+        profileTwo.setDislikedInterests(dislikedInterestsPersonTwo);
+
+        Collection<Interest> profileOneFavorites = MatchAlgorithmHelper.getFavoriteInterests(profileOne);
+        Collection<Interest> profileTwoFavorites = MatchAlgorithmHelper.getFavoriteInterests(profileTwo);
+
+        int score = MatchAlgorithmHelper.calculateLikedEachOthersInterestsScore(profileOneFavorites, profileTwoFavorites, profileOne, profileTwo);
+
+        Assertions.assertEquals(100, score);
     }
 
 }

@@ -7,10 +7,6 @@ import java.util.Collection;
 
 public class MatchAlgorithm {
 
-    private static final int AGE_SCORE_RATIO = 20;
-    private static final int SAME_INTERESTS_SCORE_RATIO = 40;
-    private static final int LIKED_EACH_OTHERS_INTERESTS_SCORE_RATIO = 40;
-
     /**
      * Calculates the match score of two profiles
      *
@@ -36,9 +32,10 @@ public class MatchAlgorithm {
 
         int likedEachOthersInterestsScore = MatchAlgorithmHelper.calculateLikedEachOthersInterestsScore(profileOneFavoriteInterests, profileTwoFavoriteInterests, profileOne, profileTwo);
 
-        return ((ageScore * AGE_SCORE_RATIO) + (sameInterestsScore * SAME_INTERESTS_SCORE_RATIO) + (likedEachOthersInterestsScore * LIKED_EACH_OTHERS_INTERESTS_SCORE_RATIO)) / 100;
+        return MatchAlgorithmHelper.calculateScore(ageScore, sameInterestsScore, likedEachOthersInterestsScore);
     }
 
-    private MatchAlgorithm() {}
+    private MatchAlgorithm() {
+    }
 
 }

@@ -14,7 +14,6 @@ public class MatchAlgorithmHelper {
     private static final int MAX_AGE_DIFF_BEST_SCORE = 2;
 
     private static final int MAX_SCORE = 100;
-    private static final int MAX_PROFILE_SCORE = 100;
 
     private static final int MIN_SAME_INTEREST_FOR_MAX_SCORE = 3;
     private static final int MIN_FAV_INTEREST_OCCURS_IN_OTHER_PROFILE_FOR_MAX_SCORE = 3;
@@ -24,6 +23,10 @@ public class MatchAlgorithmHelper {
     private static final double SAME_INTEREST_COUNT_FACTOR = 2.2;
 
     private static final int MIN_INTEREST_LIKES = 2;
+
+    private static final double AGE_SCORE_RATIO = 0.20;
+    private static final double SAME_INTERESTS_SCORE_RATIO = 0.40;
+    private static final double LIKED_EACH_OTHERS_INTERESTS_SCORE_RATIO = 0.40;
 
     /**
      * Determines if gender preferences don't conflict
@@ -86,7 +89,7 @@ public class MatchAlgorithmHelper {
                 }
             }
             if (sameInterestsCount == MIN_SAME_INTEREST_FOR_MAX_SCORE) {
-                return MAX_SCORE;
+                break;
             }
         }
 
@@ -101,19 +104,37 @@ public class MatchAlgorithmHelper {
      * @return Score between 0 and 100
      */
     public static int calculateLikedEachOthersInterestsScore(Collection<Interest> profileOneFavorites, Collection<Interest> profileTwoFavorites, Profile profileOne, Profile profileTwo) {
-        int profileOneOccurrences = getSameOccurrences(profileOneFavorites, profileTwo.getInterests());
-        int profileTwoOccurrences = getSameOccurrences(profileTwoFavorites, profileOne.getInterests());
+        int sameInterestOccurrencesOne = getSameOccurrences(profileOneFavorites, profileTwo.getInterests());
+        int sameInterestOccurrencesTwo = getSameOccurrences(profileTwoFavorites, profileOne.getInterests());
 
-        int profileOneScore = convertCountToScore(profileOneOccurrences);
-        int profileTwoScore = convertCountToScore(profileTwoOccurrences);
-
-        return (profileOneScore + profileTwoScore) / 2;
+        int scoreOne = convertCountToScore(sameInterestOccurrencesOne);
+        int scoreTwo = convertCountToScore(sameInterestOccurrencesTwo);
+        return (scoreOne + scoreTwo) / 2;
     }
 
+    /**
+     * Converts a count (0 - 3) to a score
+     *
+     * @param count The count the covert
+     * @return Score between 0 and 100
+     */
     private static int convertCountToScore(int count) {
-        return count == 0 ? 0 : MAX_SCORE - 20 - (int) Math.pow(SAME_INTEREST_SCORE_FACTOR, (MIN_SAME_INTEREST_FOR_MAX_SCORE - count) * SAME_INTEREST_COUNT_FACTOR);
+        if (count == 3) {
+            return MAX_SCORE;
+        }
+        if (count == 0) {
+            return 0;
+        }
+        return MAX_SCORE - 20 - (int) Math.pow(SAME_INTEREST_SCORE_FACTOR, (MIN_SAME_INTEREST_FOR_MAX_SCORE - count) * SAME_INTEREST_COUNT_FACTOR);
     }
 
+    /**
+     * Returns the number of objects that both occur in the Collections
+     *
+     * @param collectionOne The first collection
+     * @param collectionTwo The second collection
+     * @return
+     */
     public static int getSameOccurrences(Collection<Interest> collectionOne, Collection<Interest> collectionTwo) {
         int occurrences = 0;
         for (Interest i : collectionOne) {
@@ -137,7 +158,6 @@ public class MatchAlgorithmHelper {
      * @return The interests that are most often liked by the user
      */
     public static Collection<Interest> getFavoriteInterests(Profile profile) {
-        // Per interest aantal occurences bijhouden
         Collection<Interest> favoriteInterests = new ArrayDeque<>();
 
         Map<Interest, Integer> likes = new HashMap<>();
@@ -174,6 +194,24 @@ public class MatchAlgorithmHelper {
         return favoriteInterests;
     }
 
+    /**
+     * Calculates the total score given the other scores and ratios
+     *
+     * @param ageScore                      Score for age
+     * @param sameInterestsScore            Score for same interest
+     * @param likedEachOthersInterestsScore Score for liking each others interests
+     * @return Score
+     */
+    public static int calculateScore(int ageScore, int sameInterestsScore, int likedEachOthersInterestsScore) {
+        return (int) ((ageScore * AGE_SCORE_RATIO) + (sameInterestsScore * SAME_INTERESTS_SCORE_RATIO) + (likedEachOthersInterestsScore * LIKED_EACH_OTHERS_INTERESTS_SCORE_RATIO));
+    }
+
+    /**
+     * Makes a number positive if it is negative
+     *
+     * @param val value to make positive
+     * @return Positive value
+     */
     private static int makePositive(int val) {
         return val < 0 ? -val : val;
     }
